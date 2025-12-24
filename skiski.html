@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎿 スキー交流教室抽選会</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* ========== 設定画面 ========== */
+        .setup-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.3em;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .file-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .btn-tertiary {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .error-message {
+            background: #ff4444;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+            font-weight: bold;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* ========== 抽選画面 ========== */
+        .lottery-screen {
+            gap: 20px;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .lottery-screen.active {
+            display: flex;
+        }
+
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .lottery-header {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .lottery-header h2 {
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .progress-info {
+            font-size: 1.2em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .grid-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            flex: 1;
+        }
+
+        .lottery-grid {
+            display: grid;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .grid-cell {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-cell:hover:not(.used) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .grid-cell.used {
+            cursor: not-allowed;
+            opacity: 0.9;
+        }
+
+        .grid-cell.win {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .grid-cell.lose {
+            background: linear-gradient(135deg, #a8a8a8, #6c6c6c);
+        }
+
+        .grid-cell .number {
+            transition: opacity 0.3s;
+        }
+
+        .grid-cell .result {
+            position: absolute;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .grid-cell.used .number {
+            opacity: 0;
+        }
+
+        .grid-cell.used .result {
+            opacity: 1;
+        }
+
+        /* ========== サイドバー ========== */
+        .sidebar {
+            width: 400px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            overflow-y: auto;
+            max-height: calc(100vh - 40px);
+        }
+
+        .sidebar h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: transform 0.2s;
+        }
+
+        .result-item:hover {
+            transform: translateX(5px);
+        }
+
+        .result-item.pending {
+            background: #f0f0f0;
+            color: #999;
+        }
+
+        .result-item.win {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            font-weight: bold;
+        }
+
+        .result-item.lose {
+            background: linear-gradient(135deg, #a8a8a8, #6c6c6c);
+            color: white;
+        }
+
+        /* ========== 名前表示画面 ========== */
+        .name-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .name-display.active {
+            display: flex;
+        }
+
+        .name-display-content {
+            text-align: center;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .name-display-content .name {
+            font-size: 8em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .name-display-content .progress {
+            font-size: 3em;
+            opacity: 0.8;
+            margin-bottom: 50px;
+        }
+
+        .name-display-content .instruction {
+            font-size: 2em;
+            opacity: 0.9;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* ========== 結果表示画面 ========== */
+        .result-display {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 1001;
+            cursor: pointer;
+        }
+
+        .result-display.active {
+            display: flex;
+        }
+
+        .result-display.win {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .result-display.lose {
+            background: linear-gradient(135deg, #a8a8a8, #6c6c6c);
+        }
+
+        .result-display-content {
+            text-align: center;
+            color: white;
+            animation: resultPop 0.5s ease-out;
+        }
+
+        .result-display-content .emoji {
+            font-size: 15em;
+            margin-bottom: 30px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        .result-display-content .result-text {
+            font-size: 6em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .result-display-content .number-display {
+            font-size: 2.5em;
+            opacity: 0.95;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .result-display-content .next-instruction {
+            font-size: 2em;
+            opacity: 0.8;
+            margin-top: 50px;
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* ========== 紙吹雪 ========== */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            z-index: 1002;
+            pointer-events: none;
+            animation: confettiFall 3s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* ========== 最終結果画面 ========== */
+        .final-screen {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .final-screen h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            font-size: 1.3em;
+        }
+
+        .stats .stat {
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .stats .stat.win {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .stats .stat.lose {
+            background: linear-gradient(135deg, #a8a8a8, #6c6c6c);
+            color: white;
+        }
+
+        .final-results {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .result-column {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            max-height: calc(100vh - 400px);
+            overflow-y: auto;
+        }
+
+        .result-column h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 3px solid;
+            position: sticky;
+            top: 0;
+            background: #f8f9fa;
+            z-index: 1;
+        }
+
+        .result-column.win-column h3 {
+            color: #f5576c;
+            border-color: #f5576c;
+        }
+
+        .result-column.lose-column h3 {
+            color: #6c6c6c;
+            border-color: #6c6c6c;
+        }
+
+        .name-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .name-item {
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            page-break-inside: avoid;
+            text-align: center;
+        }
+
+        .name-item:hover {
+            transform: translateX(5px);
+        }
+
+        .win-column .name-item {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+        }
+
+        .win-column .name-item:hover {
+            box-shadow: 0 4px 12px rgba(245, 87, 108, 0.5);
+        }
+
+        .lose-column .name-item {
+            background: linear-gradient(135deg, #d0d0d0, #a0a0a0);
+            color: #333;
+            box-shadow: 0 2px 8px rgba(160, 160, 160, 0.3);
+        }
+
+        .lose-column .name-item:hover {
+            box-shadow: 0 4px 12px rgba(160, 160, 160, 0.5);
+        }
+
+
+
+        /* ========== レスポンシブ ========== */
+        @media (max-width: 1400px) {
+            .lottery-screen {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 400px;
+            }
+
+            .name-display-content .name {
+                font-size: 5em;
+            }
+
+            .result-display-content .emoji {
+                font-size: 10em;
+            }
+
+            .result-display-content .result-text {
+                font-size: 4em;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .setup-screen {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .btn {
+                min-width: 100%;
+            }
+
+            .final-results {
+                flex-direction: column;
+            }
+
+            .result-column {
+                max-height: 400px;
+            }
+
+            .final-screen h2 {
+                font-size: 2em;
+            }
+
+            .stats {
+                font-size: 1.1em;
+                gap: 15px;
+            }
+        }
+
+        /* ========== 印刷用スタイル ========== */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                max-width: 100%;
+                padding: 20px;
+            }
+
+            .final-screen {
+                box-shadow: none;
+                padding: 20px;
+                max-height: none;
+            }
+
+            .button-group {
+                display: none;
+            }
+
+            .name-item {
+                break-inside: avoid;
+            }
+
+            .final-results {
+                display: block;
+            }
+
+            .result-column {
+                page-break-inside: avoid;
+                margin-bottom: 30px;
+                max-height: none;
+                overflow: visible;
+            }
+
+            .result-column h3 {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ========== 設定画面 ========== -->
+        <div id="setupScreen" class="screen active">
+            <div class="setup-screen">
+                <h1>🎿 スキー交流教室抽選会</h1>
+                
+                <div class="form-group">
+                    <label for="participantList">参加者名簿（1行1名）</label>
+                    <textarea id="participantList" placeholder="山田太郎&#10;鈴木花子&#10;佐藤一郎&#10;..."></textarea>
+                    <label for="fileInput" class="file-upload-btn">📁 ファイルから読み込み</label>
+                    <input type="file" id="fileInput" accept=".txt">
+                </div>
+
+                <div class="form-group">
+                    <label for="winnerCount">当選者数</label>
+                    <input type="number" id="winnerCount" min="1" value="10">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="startLottery('normal')">📝 通常抽選を開始</button>
+                    <button class="btn btn-secondary" onclick="startLottery('auto')">🤖 自動進行モード</button>
+                    <button class="btn btn-tertiary" onclick="startLottery('batch')">⚡ 一括抽選</button>
+                </div>
+
+                <div id="errorMessage" class="error-message"></div>
+            </div>
+        </div>
+
+        <!-- ========== 抽選画面 ========== -->
+        <div id="lotteryScreen" class="screen lottery-screen">
+            <div class="main-area">
+                <div class="lottery-header">
+                    <h2>🎯 番号を選んでください</h2>
+                    <div class="progress-info">
+                        <span id="currentProgress">0</span> / <span id="totalProgress">0</span>
+                    </div>
+                </div>
+                <div class="grid-container">
+                    <div id="lotteryGrid" class="lottery-grid"></div>
+                </div>
+            </div>
+            <div class="sidebar">
+                <h3>📊 リアルタイム結果</h3>
+                <div id="sidebarResults"></div>
+            </div>
+        </div>
+
+        <!-- ========== 名前表示画面 ========== -->
+        <div id="nameDisplay" class="name-display">
+            <div class="name-display-content">
+                <div class="progress" id="nameProgress"></div>
+                <div class="name" id="currentName"></div>
+                <div class="instruction">クリックして番号を選んでください！</div>
+            </div>
+        </div>
+
+        <!-- ========== 結果表示画面 ========== -->
+        <div id="resultDisplay" class="result-display">
+            <div class="result-display-content">
+                <div class="emoji" id="resultEmoji"></div>
+                <div class="result-text" id="resultText"></div>
+                <div class="number-display" id="resultNumber"></div>
+                <div class="next-instruction" id="nextInstruction"></div>
+            </div>
+        </div>
+
+        <!-- ========== 最終結果画面 ========== -->
+        <div id="finalScreen" class="screen">
+            <div class="final-screen">
+                <h2>🎊 抽選結果一覧 🎊</h2>
+                
+                <div class="stats">
+                    <div class="stat win">✅ 当選: <span id="finalWinCount">0</span>名</div>
+                    <div class="stat lose">❌ 落選: <span id="finalLoseCount">0</span>名</div>
+                </div>
+
+                <div id="finalResults" class="final-results"></div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="exportCSV()">📥 CSV出力</button>
+                    <button class="btn btn-tertiary" onclick="window.print()">🖨️ 印刷</button>
+                    <button class="btn btn-primary" onclick="resetApp()">🔄 最初に戻る</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== グローバル変数 ==========
+        let participants = [];
+        let lotteryData = [];
+        let currentIndex = 0;
+        let winnerCount = 0;
+        let remainingWinSlots = 0;
+        let remainingLoseSlots = 0;
+        let usedNumbers = new Set();
+        let results = [];
+        let lotteryMode = 'normal'; // 'normal', 'auto', 'batch'
+        let audioContext = null;
+
+        // ========== 音声再生関数 ==========
+        function playSound(frequency, duration) {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        // ========== ファイル読み込み ==========
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('participantList').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // ========== 抽選開始 ==========
+        function startLottery(mode) {
+            lotteryMode = mode;
+            
+            // 参兒者リストを取得
+            const listText = document.getElementById('participantList').value;
+            if (!listText.trim()) {
+                showError('参加者名簿を入力してください。');
+                return;
+            }
+
+            // 参加者を解析（裏技検出）
+            const lines = listText.split('\n').filter(line => line.trim());
+            participants = [];
+            lotteryData = [];
+
+            let forceWinCount = 0;
+            let forceLoseCount = 0;
+
+            lines.forEach((line) => {
+                const trimmedName = line.trimEnd();
+                const spaces = line.length - trimmedName.length;
+                const name = line.trim();
+                
+                let force = null;
+                if (spaces === 1) {
+                    force = 'win';
+                    forceWinCount++;
+                } else if (spaces >= 2) {
+                    force = 'lose';
+                    forceLoseCount++;
+                }
+
+                participants.push(name);
+                lotteryData.push({
+                    name: name,
+                    force: force,
+                    result: null,
+                    number: null
+                });
+            });
+
+            // 当選者数を取得
+            winnerCount = parseInt(document.getElementById('winnerCount').value);
+            
+            // バリデーション
+            if (winnerCount < 1) {
+                showError('当選者数は1以上を設定してください。');
+                return;
+            }
+
+            if (winnerCount > participants.length) {
+                showError('当選者数が参加者数を超えています。');
+                return;
+            }
+
+            const loserCount = participants.length - winnerCount;
+
+            // バリデーション：裏技の論理チェック（エラーメッセージは裏技を隠す）
+            if (forceWinCount > winnerCount) {
+                showError('名簿のフォーマットが正しくありません。参加者名の前後に余分な空白がないか確認してください。');
+                return;
+            }
+
+            if (forceLoseCount > loserCount) {
+                showError('名簿のフォーマットが正しくありません。参加者名の前後に余分な空白がないか確認してください。');
+                return;
+            }
+
+            // 通常参加者の枠が負にならないかチェック
+            const normalParticipants = participants.length - forceWinCount - forceLoseCount;
+            const normalWinSlots = winnerCount - forceWinCount;
+            const normalLoseSlots = loserCount - forceLoseCount;
+
+            if (normalWinSlots < 0) {
+                showError('名簿のフォーマットが正しくありません。参加者名の前後に余分な空白がないか確認してください。');
+                return;
+            }
+
+            if (normalLoseSlots < 0) {
+                showError('名簿のフォーマットが正しくありません。参加者名の前後に余分な空白がないか確認してください。');
+                return;
+            }
+
+            if (normalWinSlots > normalParticipants) {
+                showError('名簿のフォーマットが正しくありません。参加者名の前後に余分な空白がないか確認してください。');
+                return;
+            }
+
+            // 初期化
+            currentIndex = 0;
+            remainingWinSlots = winnerCount - forceWinCount;
+            remainingLoseSlots = loserCount - forceLoseCount;
+            usedNumbers = new Set();
+            results = [];
+
+            // グリッドを生成
+            createGrid();
+
+            // モードに応じて開始
+            if (mode === 'batch') {
+                // 一括抽選
+                batchLottery();
+            } else {
+                // 画面遷移
+                switchScreen('lotteryScreen');
+                updateSidebar();
+                
+                if (mode === 'normal') {
+                    showNameDisplay();
+                } else if (mode === 'auto') {
+                    showNameDisplay();
+                    setTimeout(() => autoProgress(), 2000);
+                }
+            }
+        }
+
+        // ========== グリッド生成 ==========
+        function createGrid() {
+            const gridElement = document.getElementById('lotteryGrid');
+            const totalNumbers = participants.length;
+            
+            // 列数を計算（最大12列）
+            let cols = Math.min(12, Math.ceil(Math.sqrt(totalNumbers)));
+            
+            gridElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            gridElement.innerHTML = '';
+
+            for (let i = 1; i <= totalNumbers; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.innerHTML = `
+                    <span class="number">${i}</span>
+                    <span class="result"></span>
+                `;
+                cell.addEventListener('click', () => selectNumber(i));
+                gridElement.appendChild(cell);
+            }
+
+            document.getElementById('totalProgress').textContent = participants.length;
+            document.getElementById('currentProgress').textContent = '0';
+        }
+
+        // ========== 番号選択 ==========
+        function selectNumber(number) {
+            if (usedNumbers.has(number)) return;
+            if (lotteryMode === 'auto') return; // 自動モードでは手動選択不可
+
+            playSound(800, 0.1);
+            
+            const currentPerson = lotteryData[currentIndex];
+            currentPerson.number = number;
+            usedNumbers.add(number);
+
+            // 結果を判定
+            let result;
+            if (currentPerson.force === 'win') {
+                result = 'win';
+            } else if (currentPerson.force === 'lose') {
+                result = 'lose';
+            } else {
+                // ランダム判定
+                const totalRemaining = remainingWinSlots + remainingLoseSlots;
+                if (totalRemaining === 0) {
+                    result = 'lose';
+                } else {
+                    const winProbability = remainingWinSlots / totalRemaining;
+                    result = Math.random() < winProbability ? 'win' : 'lose';
+                }
+            }
+
+            currentPerson.result = result;
+
+            if (result === 'win') {
+                remainingWinSlots--;
+            } else {
+                remainingLoseSlots--;
+            }
+
+            // グリッドを更新
+            updateGridCell(number, result);
+
+            // 結果を表示
+            showResultDisplay(result, number);
+        }
+
+        // ========== グリッドセル更新 ==========
+        function updateGridCell(number, result) {
+            const cells = document.querySelectorAll('.grid-cell');
+            const cell = cells[number - 1];
+            cell.classList.add('used', result);
+            cell.querySelector('.result').textContent = result === 'win' ? '🎉' : '💧';
+        }
+
+        // ========== サイドバー更新 ==========
+        function updateSidebar() {
+            const sidebar = document.getElementById('sidebarResults');
+            sidebar.innerHTML = '';
+
+            lotteryData.forEach((person, index) => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                
+                if (person.result === null) {
+                    item.classList.add('pending');
+                    item.textContent = `${person.name} - 未抽選`;
+                } else if (person.result === 'win') {
+                    item.classList.add('win');
+                    item.textContent = `${person.name} - 🎉 当選`;
+                } else {
+                    item.classList.add('lose');
+                    item.textContent = `${person.name} - 💧 落選`;
+                }
+
+                sidebar.appendChild(item);
+            });
+        }
+
+        // ========== 名前表示画面 ==========
+        function showNameDisplay() {
+            const currentPerson = lotteryData[currentIndex];
+            document.getElementById('nameProgress').textContent = `${currentIndex + 1} / ${participants.length}`;
+            document.getElementById('currentName').textContent = currentPerson.name;
+            
+            document.getElementById('nameDisplay').classList.add('active');
+            
+            if (lotteryMode === 'normal') {
+                document.getElementById('nameDisplay').onclick = hideNameDisplay;
+            }
+        }
+
+        function hideNameDisplay() {
+            document.getElementById('nameDisplay').classList.remove('active');
+            document.getElementById('nameDisplay').onclick = null;
+        }
+
+        // ========== 結果表示画面 ==========
+        function showResultDisplay(result, number) {
+            const currentPerson = lotteryData[currentIndex];
+            const resultDisplay = document.getElementById('resultDisplay');
+            resultDisplay.className = 'result-display active ' + result;
+            
+            document.getElementById('resultEmoji').textContent = result === 'win' ? '🎉' : '💧';
+            document.getElementById('resultText').textContent = result === 'win' ? '当選！' : '落選';
+            document.getElementById('resultNumber').textContent = currentPerson.name; // 名前を表示
+            
+            // 音声再生
+            if (lotteryMode !== 'batch') {
+                if (result === 'win') {
+                    playSound(1200, 0.5);
+                    createConfetti();
+                } else {
+                    playSound(300, 0.3);
+                }
+            }
+
+            // 次の指示
+            const isLast = currentIndex === participants.length - 1;
+            if (isLast) {
+                document.getElementById('nextInstruction').textContent = 'クリックして最終結果へ →';
+            } else {
+                document.getElementById('nextInstruction').textContent = '';
+            }
+
+            // サイドバー更新
+            updateSidebar();
+            document.getElementById('currentProgress').textContent = currentIndex + 1;
+
+            // 次へ進む
+            if (lotteryMode === 'normal') {
+                setTimeout(() => {
+                    resultDisplay.onclick = proceedToNext;
+                }, 1500);
+            } else if (lotteryMode === 'auto') {
+                setTimeout(() => {
+                    proceedToNext();
+                }, 2000);
+            }
+        }
+
+        // ========== 次へ進む ==========
+        function proceedToNext() {
+            document.getElementById('resultDisplay').classList.remove('active');
+            document.getElementById('resultDisplay').onclick = null;
+            
+            currentIndex++;
+            
+            if (currentIndex >= participants.length) {
+                // 全員終了
+                setTimeout(() => showFinalResults(), 500);
+            } else {
+                // 次の参加者
+                if (lotteryMode === 'auto') {
+                    setTimeout(() => {
+                        showNameDisplay();
+                        autoProgress();
+                    }, 500);
+                } else {
+                    showNameDisplay();
+                }
+            }
+        }
+
+        // ========== 自動進行 ==========
+        function autoProgress() {
+            setTimeout(() => {
+                hideNameDisplay();
+                
+                // ランダムな番号を選択
+                const availableNumbers = [];
+                for (let i = 1; i <= participants.length; i++) {
+                    if (!usedNumbers.has(i)) {
+                        availableNumbers.push(i);
+                    }
+                }
+                
+                const randomNumber = availableNumbers[Math.floor(Math.random() * availableNumbers.length)];
+                selectNumber(randomNumber);
+            }, 2000);
+        }
+
+        // ========== 一括抽選 ==========
+        function batchLottery() {
+            // 全員分を一気に抽選
+            const numbers = Array.from({length: participants.length}, (_, i) => i + 1);
+            shuffleArray(numbers);
+
+            lotteryData.forEach((person, index) => {
+                const number = numbers[index];
+                person.number = number;
+                usedNumbers.add(number);
+
+                // 結果を判定
+                let result;
+                if (person.force === 'win') {
+                    result = 'win';
+                } else if (person.force === 'lose') {
+                    result = 'lose';
+                } else {
+                    const totalRemaining = remainingWinSlots + remainingLoseSlots;
+                    if (totalRemaining === 0) {
+                        result = 'lose';
+                    } else {
+                        const winProbability = remainingWinSlots / totalRemaining;
+                        result = Math.random() < winProbability ? 'win' : 'lose';
+                    }
+                }
+
+                person.result = result;
+
+                if (result === 'win') {
+                    remainingWinSlots--;
+                } else {
+                    remainingLoseSlots--;
+                }
+            });
+
+            // 最終結果へ
+            showFinalResults();
+        }
+
+        // ========== 配列シャッフル ==========
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // ========== 紙吹雪生成 ==========
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.top = '-10px';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        // ========== 最終結果表示 ==========
+        function showFinalResults() {
+            switchScreen('finalScreen');
+
+            const winCount = lotteryData.filter(p => p.result === 'win').length;
+            const loseCount = lotteryData.filter(p => p.result === 'lose').length;
+
+            document.getElementById('finalWinCount').textContent = winCount;
+            document.getElementById('finalLoseCount').textContent = loseCount;
+
+            const finalResults = document.getElementById('finalResults');
+            finalResults.innerHTML = '';
+
+            // 当選者と落選者を分ける
+            const winners = lotteryData.filter(p => p.result === 'win');
+            const losers = lotteryData.filter(p => p.result === 'lose');
+
+            console.log('=== 最終結果表示 ===');
+            console.log('当選者:', winners.map(p => p.name));
+            console.log('落選者:', losers.map(p => p.name));
+
+            // 当選者列
+            const winColumn = document.createElement('div');
+            winColumn.className = 'result-column win-column';
+            winColumn.innerHTML = '<h3>🎉 当選者</h3>';
+            const winList = document.createElement('div');
+            winList.className = 'name-list';
+            winners.forEach((person) => {
+                const item = document.createElement('div');
+                item.className = 'name-item';
+                item.textContent = person.name; // 名前のみ
+                console.log('当選者追加:', person.name);
+                winList.appendChild(item);
+            });
+            winColumn.appendChild(winList);
+            finalResults.appendChild(winColumn);
+
+            // 落選者列
+            const loseColumn = document.createElement('div');
+            loseColumn.className = 'result-column lose-column';
+            loseColumn.innerHTML = '<h3>💧 落選者</h3>';
+            const loseList = document.createElement('div');
+            loseList.className = 'name-list';
+            losers.forEach((person) => {
+                const item = document.createElement('div');
+                item.className = 'name-item';
+                item.textContent = person.name; // 名前のみ
+                console.log('落選者追加:', person.name);
+                loseList.appendChild(item);
+            });
+            loseColumn.appendChild(loseList);
+            finalResults.appendChild(loseColumn);
+
+            console.log('=== 表示完了 ===');
+        }
+
+        // ========== CSV出力 ==========
+        function exportCSV() {
+            let csv = '\uFEFF'; // BOM for Excel
+            csv += '名前,結果\n';
+            
+            lotteryData.forEach(person => {
+                csv += `${person.name},${person.result === 'win' ? '当選' : '落選'}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `抽選結果_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        // ========== アプリリセット ==========
+        function resetApp() {
+            participants = [];
+            lotteryData = [];
+            currentIndex = 0;
+            usedNumbers = new Set();
+            results = [];
+            
+            document.getElementById('participantList').value = '';
+            document.getElementById('winnerCount').value = '10';
+            document.getElementById('errorMessage').classList.remove('show');
+            
+            switchScreen('setupScreen');
+        }
+
+        // ========== 画面切り替え ==========
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // ========== エラー表示 ==========
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+            
+            setTimeout(() => {
+                errorElement.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
